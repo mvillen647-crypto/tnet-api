@@ -13,6 +13,15 @@ export default async function handler(req, res) {
 
   // 🔐 Authenticate API Key
   const auth = await authenticate(req);
+  import { rateLimit } from "../middleware/rateLimit.js";
+  const limit = await rateLimit(auth.userId, "/api/analyze");
+
+if (!limit.ok) {
+  return res.status(429).json({
+    success: false,
+    message: limit.message
+  });
+}
 
   if (!auth.ok) {
     return res.status(401).json({
