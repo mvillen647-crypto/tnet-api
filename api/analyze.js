@@ -1,11 +1,19 @@
+import { authenticate } from "../middleware/auth.js";
 import { trustEngine } from "../lib/engine.js";
 import { analyzeImage } from "../services/sightengine.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(405).json({
+    return res.status(405).json({ success: false, message: "Method Not Allowed" });
+  }
+
+  // 🔐 AUTH CHECK
+  const auth = authenticate(req);
+
+  if (!auth.ok) {
+    return res.status(401).json({
       success: false,
-      message: "Method Not Allowed"
+      message: auth.error
     });
   }
 
@@ -14,20 +22,11 @@ export default async function handler(req, res) {
 
     let imageResult = null;
 
-    // =========================
-    // IMAGE AI CALL (optional)
-    // =========================
     if (imageUrl) {
       const ai = await analyzeImage(imageUrl);
-
-      if (ai.success) {
-        imageResult = ai.data;
-      }
+      if (ai.success) imageResult = ai.data;
     }
 
-    // =========================
-    // TRUST ENGINE (CORE BRAIN)
-    // =========================
     const result = trustEngine({
       image: imageResult,
       url,
@@ -37,20 +36,14 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       success: true,
-      input: {
-        imageUrl: imageUrl || null,
-        url: url || null,
-        text: text || null,
-        qr: qr || null
-      },
+      user: auth.user.name,
       result
     });
 
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Server error",
-      error: error.message
+      message: error.message
     });
   }
-        }
+}
