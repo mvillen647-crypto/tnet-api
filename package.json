@@ -1,13 +1,8 @@
 {
   "name": "tnet-api",
   "version": "1.0.0",
-  "description": "TNet Trust Network API",
-  "private": true,
   "type": "module",
-  "scripts": {
-    "start": "vercel dev"
-  },
-  "engines": {
-    "node": ">=20"
+  "dependencies": {
+    "@supabase/supabase-js": "^2.52.0"
   }
 }
