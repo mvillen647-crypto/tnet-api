@@ -12,12 +12,16 @@ export default async function handler(req, res) {
   try {
     const { name, email } = req.body;
 
-    if (!name || !email) {
-      return res.status(400).json({
-        success: false,
-        message: "Name and email are required"
-      });
-    }
+    import { validateRegister } from "../validators/register.js";
+
+const error = validateRegister(req.body);
+
+if (error) {
+  return res.status(400).json({
+    success: false,
+    message: error
+  });
+}
 
     // Check if email already exists
     const { data: existingUser } = await supabase
