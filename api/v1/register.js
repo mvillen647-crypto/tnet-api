@@ -1,5 +1,6 @@
 import crypto from "crypto";
-import supabase from "../lib/supabase.js";
+import supabase from "../../lib/supabase.js";
+import { validateRegister } from "../../validators/register.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -76,10 +77,10 @@ if (error) {
       apiKey
     });
 
-  } catch (error) {
+    } catch (error) {
     return res.status(500).json({
       success: false,
       message: error.message
     });
   }
-  }
+}
